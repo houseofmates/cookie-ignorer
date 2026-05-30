@@ -6,6 +6,7 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { formatFile } from "./prettier.js";
 import * as acorn from "acorn";
+import { posthog, distinctId } from "./posthog.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -101,6 +102,16 @@ async function addOrReplaceRule(domain, css, common, handler, skipPrettier) {
 
   if (existingProperty) {
     console.log(`Replacing existing rule for domain: ${domain}`);
+    posthog.capture({
+      distinctId,
+      event: "rule_replaced",
+      properties: {
+        domain,
+        has_css: !!css,
+        has_common: common !== undefined,
+        has_handler: handler !== undefined,
+      },
+    });
 
     const start = existingProperty.start;
     const end = existingProperty.end;
@@ -134,6 +145,16 @@ async function addOrReplaceRule(domain, css, common, handler, skipPrettier) {
       content.slice(0, lineStart) + entryString + content.slice(actualEnd);
   } else {
     console.log(`Adding new rule for domain: ${domain}`);
+    posthog.capture({
+      distinctId,
+      event: "rule_added",
+      properties: {
+        domain,
+        has_css: !!css,
+        has_common: common !== undefined,
+        has_handler: handler !== undefined,
+      },
+    });
 
     let insertPosition = rulesObject.end - 1;
 
