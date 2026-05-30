@@ -1,6 +1,7 @@
 // This is used to generate the block rules for Manifest V3 from the block rules in Manifest V2.
 
 import { blockUrls } from "../src/data/rules.js";
+import { posthog, distinctId } from "./posthog.js";
 
 function generateDeclarativeNetRules() {
   const result = [];
@@ -49,6 +50,21 @@ function generateDeclarativeNetRules() {
   }
 
   console.log(JSON.stringify(result, null, "\t"));
+  return result.length;
 }
 
-generateDeclarativeNetRules();
+async function main() {
+  try {
+    const ruleCount = generateDeclarativeNetRules();
+    posthog.capture({
+      distinctId,
+      event: "block_rules_generated",
+      properties: { rule_count: ruleCount },
+    });
+  } catch (error) {
+    posthog.captureException(error, distinctId);
+  }
+  await posthog.shutdown();
+}
+
+main();

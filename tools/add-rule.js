@@ -222,15 +222,23 @@ program
       console.error(
         "Error: At least one of --css, --common, or --handler must be provided"
       );
+      await posthog.shutdown();
       process.exit(1);
     }
-    await addOrReplaceRule(
-      options.domain,
-      options.css,
-      options.common,
-      options.handler,
-      options.skipPrettier === true
-    );
+    try {
+      await addOrReplaceRule(
+        options.domain,
+        options.css,
+        options.common,
+        options.handler,
+        options.skipPrettier === true
+      );
+    } catch (error) {
+      posthog.captureException(error, distinctId, { domain: options.domain });
+      await posthog.shutdown();
+      throw error;
+    }
+    await posthog.shutdown();
   });
 
 program.parse();
