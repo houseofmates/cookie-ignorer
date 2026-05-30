@@ -1,0 +1,17 @@
+[
+  {
+    "event": "rule_added",
+    "description": "A new domain rule was successfully added to rules.js via the add-rule CLI tool",
+    "file": "tools/add-rule.js"
+  },
+  {
+    "event": "rule_replaced",
+    "description": "An existing domain rule was replaced in rules.js via the add-rule CLI tool",
+    "file": "tools/add-rule.js"
+  },
+  {
+    "event": "block_rules_generated",
+    "description": "Declarative net request block rules were generated for Manifest V3 from the existing block URL rules",
+    "file": "tools/generate-block-rules.js"
+  }
+]
